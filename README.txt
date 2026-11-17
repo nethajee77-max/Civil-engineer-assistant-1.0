@@ -1,20 +1,32 @@
-CIVIL ENGINEER ASSISTANT — ANDROID PROJECT
-Included:
-- Offline searchable civil engineering Q&A reference
-- Concrete volume, steel weight, brick estimate and area conversion calculators
-- Pre-concrete-pour checklist
-- Android WebView wrapper project
+name: Build Android APK
 
-BUILD APK:
-1. Install Android Studio (current stable) on a computer.
-2. Open this project folder in Android Studio.
-3. Allow Gradle sync and install the required Android SDK (compileSdk 35).
-4. Select Build > Build Bundle(s) / APK(s) > Build APK(s).
-5. Find the debug APK at app/build/outputs/apk/debug/app-debug.apk.
-6. Transfer it to your Android phone and install. You may need to allow installation from that source.
+on:
+  push:
+    branches: [ main, master ]
 
-LIMITATIONS:
-- This starter app works offline and contains a curated starter set of common questions.
-- It is not connected to a live AI service, does not read DWG/Revit files and does not perform structural design.
-- Live AI answers would require a secure backend and an API key; never embed a private API key in the APK.
-- All engineering values and designs must be verified against current applicable IS codes, project specifications and qualified engineer approval.
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Build APK with Gradle
+        run: gradle assembleDebug
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: app/build/outputs/apk/debug/app-debug.apk
